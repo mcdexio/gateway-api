@@ -1,0 +1,196 @@
+{
+	"info": {
+		"_postman_id": "e9bc4031-deaf-4f29-bc90-71cce570b5a0",
+		"name": "MCDEX",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "default",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "perpetual",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/perpetual?symbol=00001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						"perpetual"
+					],
+					"query": [
+						{
+							"key": "symbol",
+							"value": "00001"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "privateKey",
+							"value": "{{privateKey}}",
+							"type": "text"
+						},
+						{
+							"key": "symbol",
+							"value": "00001",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/account",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "price",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/price?symbol=00001&amount=-5",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						"price"
+					],
+					"query": [
+						{
+							"key": "symbol",
+							"value": "00001"
+						},
+						{
+							"key": "amount",
+							"value": "-5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "trade",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "privateKey",
+							"value": "{{privateKey}}",
+							"type": "text"
+						},
+						{
+							"key": "symbol",
+							"value": "00001",
+							"type": "text"
+						},
+						{
+							"key": "amount",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "isCloseOnly",
+							"value": "false",
+							"type": "text"
+						},
+						{
+							"key": "limitPrice",
+							"value": "1000000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/trade",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						"trade"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "receipt",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{port}}/mcdex/receipt?txHash=0x340a7cd95341800c93911267640a494d24f0710e11bf92776c566af4584f2461",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"mcdex",
+						"receipt"
+					],
+					"query": [
+						{
+							"key": "txHash",
+							"value": "0x340a7cd95341800c93911267640a494d24f0710e11bf92776c566af4584f2461"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

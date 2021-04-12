@@ -12,6 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@mcdex/mai3-abi": "^0.3.40",
     "@balancer-labs/sor": "^0.3.3",
     "@perp/contract": "^1.0.6",
     "@terra-money/terra.js": "^0.5.8",

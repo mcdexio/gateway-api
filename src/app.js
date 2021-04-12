@@ -15,6 +15,7 @@ import ethRoutes from './routes/eth.route'
 import terraRoutes from './routes/terra.route'
 import uniswapRoutes from './routes/uniswap.route'
 import perpFiRoutes from './routes/perpetual_finance.route'
+import mcdexRoutes from './routes/mcdex.route'
 
 // terminate if environment not found
 const result = dotenv.config();
@@ -48,6 +49,7 @@ app.use('/eth/balancer', balancerRoutes);
 app.use('/terra', terraRoutes);
 app.use('/perpfi', perpFiRoutes);
 // app.use('/celo', celoRoutes);
+app.use('/mcdex', mcdexRoutes);
 
 app.get('/', (req, res, next) => {
   res.send('ok')
