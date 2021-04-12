@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mcdex/mai3.js": "^0.5.46",
     "@balancer-labs/sor": "^0.3.3",
     "@ethersproject/experimental": "^5.1.2",
     "@perp/contract": "^1.0.6",

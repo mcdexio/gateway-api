@@ -15,6 +15,7 @@ import terraRoutes from './routes/terra.route';
 import uniswapRoutes from './routes/uniswap.route';
 import uniswapV3Routes from './routes/uniswap_v3.route';
 import perpFiRoutes from './routes/perpetual_finance.route';
+import mcdexRoutes from './routes/mcdex.route';
 
 //load configs
 const globalConfig =
@@ -46,6 +47,7 @@ app.use('/eth/balancer', balancerRoutes);
 app.use('/terra', terraRoutes);
 app.use('/perpfi', perpFiRoutes);
 // app.use('/celo', celoRoutes);
+app.use('/mcdex', mcdexRoutes);
 
 app.get('/', (req, res, _next) => {
   res.send('ok');

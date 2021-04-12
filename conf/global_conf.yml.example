@@ -65,6 +65,10 @@ UNISWAP_PAIRS_CACHE_TIME: 1000
 CERT_PATH:
 CERT_PASSPHRASE:
 
+# mcdex
+# - kovan: https://api.thegraph.com/subgraphs/name/mcdexio/mcdex3-kovan1
+MCDEX_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/mcdexio/mcdex3-{subgraph_chain}
+
 # logs
 # default to ./logs if path is not set
 LOG_PATH: ./logs
