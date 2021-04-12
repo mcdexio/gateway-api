@@ -896,10 +896,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@mcdex/mai3.js@^0.5.46":
-  version "0.5.46"
-  resolved "https://registry.npmjs.org/@mcdex/mai3.js/-/mai3.js-0.5.46.tgz#6382eda1cc171b55e9ef220edb60071de78af788"
-  integrity sha512-ZGLxkGDNs8wHGuKyoXYNclSner+OB2g1u2nQ+wyHLYvTcqKzxUUEwwiUsHbtEenj1ifbermTidaSVcJOIwEEeQ==
+"@mcdex/mai3.js@^0.5.69":
+  version "0.5.70"
+  resolved "https://registry.npmjs.org/@mcdex/mai3.js/-/mai3.js-0.5.70.tgz#fe2c51901fb4d722b61368c82493f5174fe5f06f"
+  integrity sha512-TO507Mx6wiAsvllP8FoibAyVNifBekq+/xohTjnDgYaTYirtyPRm0noSJ06RVSoe4rMTD6UFytVBPCNo/BEcEw==
   dependencies:
     bignumber.js "~9.0.0"
     ethers "^5.0.26"

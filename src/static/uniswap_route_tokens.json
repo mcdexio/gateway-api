@@ -68,5 +68,9 @@
       "symbol": "USDC",
       "decimals": 6
     }
+  ],
+  "arb": [
+  ],
+  "arbtest": [
   ]
 }

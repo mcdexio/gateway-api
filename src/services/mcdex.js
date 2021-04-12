@@ -33,14 +33,11 @@ export default class mcdex {
       case 'kovan':
         this.chainID = 42;
         break;
-      case 's10':
-        this.chainID = 1337;
+      case 'arb':
+        this.chainID = 42161;
         break;
-      case 'bsc':
-        this.chainID = 56;
-        break;
-      case 'bscTestnet':
-        this.chainID = 97;
+      case 'arbtest':
+        this.chainID = 421611;
         break;
       default:
         const err = `Invalid network ${network}`;
@@ -187,19 +184,25 @@ export default class mcdex {
     }
   }
 
-  async getPrice(liquidityPoolAddress, perpetualIndex, amount) {
+  async getPrice(liquidityPoolAddress, perpetualIndex, amount, trader, isCloseOnly) {
     const bigAmount = new BigNumber(amount.toString()).shiftedBy(DECIMALS).dp(0);
     const reader = ReaderFactory.connect(this.reader, this.provider);
+    let flags = TradeFlag.MASK_USE_TARGET_LEVERAGE;
+    if (isCloseOnly) {
+      flags = flags + TradeFlag.MASK_CLOSE_ONLY; // do NOT use "|=" to prevent js error
+    }
     try {
-      const { isSynced, deltaCash, deltaPosition } = await reader.callStatic.queryTradeWithAMM(
-        liquidityPoolAddress, perpetualIndex, bigAmount.toFixed());
+      const { isSynced, tradePrice, totalFee, cost } = await reader.callStatic.queryTrade(
+        liquidityPoolAddress, perpetualIndex, trader,
+        bigAmount.toFixed(), REFERER_ADDRESS, flags);
       if (!isSynced) {
         throw new Error("sync perpetual storage failed");
       }
-      const cash = new BigNumber(deltaCash.toString()).shiftedBy(-DECIMALS);
-      const position = new BigNumber(deltaPosition.toString()).shiftedBy(-DECIMALS);
-      const price = cash.div(position).abs().toFixed();
-      return price;
+      return {
+        price: new BigNumber(tradePrice.toString()).shiftedBy(-DECIMALS),
+        totalFee: new BigNumber(totalFee.toString()).shiftedBy(-DECIMALS),
+        cost: new BigNumber(cost.toString()).shiftedBy(-DECIMALS),
+      };
     } catch (err) {
       // find "trade amount exceeds max amount"
       if (err.error && err.error.data && err.error.data.indexOf('65786365656473') > 0) {

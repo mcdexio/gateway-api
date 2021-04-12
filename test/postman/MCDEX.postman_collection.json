@@ -92,7 +92,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:{{port}}/mcdex/price?symbol=00001&amount=-5",
+					"raw": "https://localhost:{{port}}/mcdex/price?symbol=00001&amount=-2&trader=please fill your wallet address&isCloseOnly=false",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -110,6 +110,14 @@
 						{
 							"key": "amount",
 							"value": "-5"
+						},
+						{
+							"key": "trader",
+							"value": "please fill your wallet address"
+						},
+						{
+							"key": "isCloseOnly",
+							"value": "false"
 						}
 					]
 				}

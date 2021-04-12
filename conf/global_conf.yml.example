@@ -26,6 +26,7 @@ TERRA_CHAIN:
 # - token list: erc20 token list source (ref: https://tokenlists.org/)
 ETHEREUM_CHAIN:
 ETHEREUM_RPC_URL: "https://{chain}.infura.io/v3/{api_key}"
+#ETHEREUM_RPC_URL: "https://rinkeby.arbitrum.io/rpc"
 ETHEREUM_TOKEN_LIST_URL: https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link
 
 # Balancer
@@ -67,7 +68,9 @@ CERT_PASSPHRASE:
 
 # mcdex
 # - kovan: https://api.thegraph.com/subgraphs/name/mcdexio/mcdex3-kovan1
-MCDEX_SUBGRAPH_URL: https://api.thegraph.com/subgraphs/name/mcdexio/mcdex3-{subgraph_chain}
+# - arbtest: https://graph-arb-testnet.mcdex.io/subgraphs/name/mcdexio/mcdex3-oracle-arb
+# - arb: https://graph-arb1.mcdex.io/subgraphs/name/mcarloai/mcdex3-arb
+MCDEX_SUBGRAPH_URL: https://graph-arb-testnet.mcdex.io/subgraphs/name/mcdexio/mcdex3-oracle-arb
 
 # logs
 # default to ./logs if path is not set

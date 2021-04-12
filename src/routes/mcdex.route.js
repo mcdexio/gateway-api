@@ -152,10 +152,14 @@ router.get('/price', async (req, res) => {
   /*
     GET: /price?symbol={{symbol}} // ex: 00001
                &amount={{amount}} // < 0 means sell
+               &trader={{trader}} // an address
+               &isCloseOnly=false // true | false
   */
  const initTime = Date.now();
  const symbol = req.query.symbol;
  const amount = req.query.amount;
+ const trader = req.query.trader;
+ const isCloseOnly = req.query.isCloseOnly === 'true';
  let perpetual;
  try {
    perpetual = await getPerpetualInfoBySymbol(symbol);
@@ -172,7 +176,11 @@ router.get('/price', async (req, res) => {
    if (!amount || amount === '0') {
      throw Error('invalid "amount"');
    }
-   const price = await mcdex.getPrice(perpetual.liquidityPoolAddress, perpetual.perpetualIndex, amount);
+   const price = await mcdex.getPrice(
+     perpetual.liquidityPoolAddress,
+     perpetual.perpetualIndex,
+     amount, trader, isCloseOnly
+   );
    logger.info('mcdex.route - price', { symbol, amount });
    res.status(200).json({
      network: mcdex.network,

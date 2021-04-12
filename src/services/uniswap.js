@@ -47,6 +47,12 @@ export default class Uniswap {
       case 'kovan':
         this.chainID = uni.ChainId.KOVAN;
         break;
+      case 'arb':
+        this.chainID = 42161;
+        break;
+      case 'arbtest':
+        this.chainID = 421611;
+        break;
       default: {
         const err = `Invalid network ${network}`;
         logger.error(err);
