@@ -197,6 +197,15 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "symbols",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
 		}
 	]
 }

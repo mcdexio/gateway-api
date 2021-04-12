@@ -11,11 +11,12 @@ import { getLiquidityPool, getAccountStorage, computeAccount } from '@mcdex/mai3
 
 const TRADE_EXPIRE_TIME = 86400;
 const REFERER_ADDRESS = '0x0000000000000000000000000000000000000000';
-
 export default class mcdex {
   constructor (network = 'mainnet') {
     this.providerUrl = process.env.ETHEREUM_RPC_URL;
     this.network = process.env.ETHEREUM_CHAIN;
+    this.tradeGasBase = process.env.MCDEX_TRADE_GAS_BASE || 555000;
+    this.tradeGasPerPerpetual = process.env.MCDEX_TRADE_GAS_PER_PERPETUAL || 80000;
     this.provider = new ethers.providers.JsonRpcProvider(this.providerUrl);
     this.subgraphUrl = process.env.MCDEX_SUBGRAPH_URL;
     if (!this.subgraphUrl) {
@@ -89,6 +90,17 @@ export default class mcdex {
     };
   }
 
+  async queryAllSymbols() {
+    const graphResult = await this.readGraphQL(`
+      {
+        perpetuals {
+          symbol
+        }
+      }
+      `);
+    return graphResult.perpetuals.map(i => i.symbol);
+  }
+
   async getPerpetual(liquidityPoolAddress, perpetualIndex) {
     const reader = ReaderFactory.connect(this.reader, this.provider);
     const liquidityPoolStorage = await getLiquidityPool(reader, liquidityPoolAddress);
@@ -114,6 +126,7 @@ export default class mcdex {
       vaultFeeRate: liquidityPoolStorage.vaultFeeRate.toFixed(),
       operatorFeeRate: perpetual.operatorFeeRate.toFixed(),
       lpFeeRate: perpetual.lpFeeRate.toFixed(),
+      perpetualCountInLiquidityPool: liquidityPoolStorage.perpetuals.size,
     }
   }
 
@@ -194,7 +207,9 @@ export default class mcdex {
     }
   }
 
-  async trade(wallet, liquidityPoolAddress, perpetualIndex, amount, limitPrice, isCloseOnly, gasPrice) {
+  async trade(
+    wallet, liquidityPoolAddress, perpetualIndex, amount,
+    limitPrice, isCloseOnly, gasPrice, gasLimit) {
     const traderAddress = wallet.address;
     const bigAmount = new BigNumber(amount.toString()).shiftedBy(DECIMALS).dp(0);
     const bigLimitPrice = new BigNumber(limitPrice.toString()).shiftedBy(DECIMALS).dp(0);
@@ -207,7 +222,19 @@ export default class mcdex {
     const liquidityPool = LiquidityPoolFactory.connect(liquidityPoolAddress, signer);
     const tx = await liquidityPool.trade(
       perpetualIndex, traderAddress, bigAmount.toFixed(), bigLimitPrice.toFixed(),
-      deadline, REFERER_ADDRESS, flags, { gasPrice: gasPrice * 1e9 });
+      deadline, REFERER_ADDRESS, flags,
+      {
+        gasPrice: gasPrice * 1e9,
+        gasLimit
+      });
     return tx;
+  }
+
+  estimateTradeGasLimit(perpetualCountInLiquidityPool) {
+    if (!perpetualCountInLiquidityPool) {
+      throw new Error('can not fetch perpetualCountInLiquidityPool')
+    }
+    const gasLimit = this.tradeGasBase + perpetualCountInLiquidityPool * this.tradeGasPerPerpetual;
+    return gasLimit;
   }
 }

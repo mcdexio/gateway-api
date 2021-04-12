@@ -52,31 +52,25 @@ router.get('/symbols', async (req, res) => {
   }
 })
 
+const getPerpetualInfoBySymbol = async function (symbol) {
+  if (!symbol) {
+    throw Error('missing "symbol"');
+  }
+  const uid = await mcdex.queryPerpetualBySymbol(symbol);
+  const liquidityPoolAddress = uid.liquidityPoolAddress;
+  const perpetualIndex = uid.perpetualIndex;
+  const perpetual = await mcdex.getPerpetual(liquidityPoolAddress, perpetualIndex);
+  return perpetual;
+}
+
 router.get('/perpetual', async (req, res) => {
   /*
     GET: /perpetual?symbol={{symbol}} // ex: 00001
   */
   const initTime = Date.now();
   const symbol = req.query.symbol;
-  let liquidityPoolAddress, perpetualIndex;
   try {
-    if (!symbol) {
-      throw Error('missing "symbol"');
-    }
-    const uid = await mcdex.queryPerpetualBySymbol(symbol);
-    liquidityPoolAddress = uid.liquidityPoolAddress;
-    perpetualIndex = uid.perpetualIndex;
-  } catch (err) {
-    logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Symbol not found";
-    const message = err.message ? err.message : err;
-    res.status(500).json({
-      error: reason,
-      message,
-    });
-  }
-  try {
-    const perpetual = await mcdex.getPerpetual(liquidityPoolAddress, perpetualIndex);
+    const perpetual = await getPerpetualInfoBySymbol(symbol);
     logger.info('mcdex.route - perpetual', { symbol });
     res.status(200).json({
       network: mcdex.network,
@@ -86,7 +80,7 @@ router.get('/perpetual', async (req, res) => {
     });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Read LiquidityPool failed";
+    const reason = "Symbol not found or read LiquidityPool failed";
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
@@ -120,17 +114,12 @@ router.post('/account', async (req, res) => {
     });
     return;
   }
-  let liquidityPoolAddress, perpetualIndex;
+  let perpetual;
   try {
-    if (!symbol) {
-      throw Error('missing "symbol"');
-    }
-    const uid = await mcdex.queryPerpetualBySymbol(symbol);
-    liquidityPoolAddress = uid.liquidityPoolAddress;
-    perpetualIndex = uid.perpetualIndex;
+    perpetual = await getPerpetualInfoBySymbol(symbol);
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Symbol not found";
+    const reason = "Symbol not found or read LiquidityPool failed";
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
@@ -138,7 +127,7 @@ router.post('/account', async (req, res) => {
     });
   }
   try {
-    const account = await mcdex.getAccount(wallet, liquidityPoolAddress, perpetualIndex);
+    const account = await mcdex.getAccount(wallet, perpetual.liquidityPoolAddress, perpetual.perpetualIndex);
     logger.info('mcdex.route - account', { symbol });
     res.status(200).json({
       network: mcdex.network,
@@ -165,17 +154,12 @@ router.get('/price', async (req, res) => {
  const initTime = Date.now();
  const symbol = req.query.symbol;
  const amount = req.query.amount;
- let liquidityPoolAddress, perpetualIndex;
+ let perpetual;
  try {
-   if (!symbol) {
-     throw Error('missing "symbol"');
-   }
-   const uid = await mcdex.queryPerpetualBySymbol(symbol);
-   liquidityPoolAddress = uid.liquidityPoolAddress;
-   perpetualIndex = uid.perpetualIndex;
+   perpetual = await getPerpetualInfoBySymbol(symbol);
  } catch (err) {
    logger.error(req.originalUrl, { message: err });
-   const reason = err.reason ? err.reason : "Symbol not found";
+   const reason = "Symbol not found or read LiquidityPool failed";
    const message = err.message ? err.message : err;
    res.status(500).json({
      error: reason,
@@ -186,7 +170,7 @@ router.get('/price', async (req, res) => {
    if (!amount || amount === '0') {
      throw Error('invalid "amount"');
    }
-   const price = await mcdex.getPrice(liquidityPoolAddress, perpetualIndex, amount);
+   const price = await mcdex.getPrice(perpetual.liquidityPoolAddress, perpetual.perpetualIndex, amount);
    logger.info('mcdex.route - price', { symbol, amount });
    res.status(200).json({
      network: mcdex.network,
@@ -214,7 +198,7 @@ router.post('/trade', async (req, res) => {
       amount: {{amount}}, // < 0 means sell
       limitPrice: {{limitPrice}},
       isCloseOnly: false // true | false,
-      gasPrice: 100
+      gasPrice: 100 | undefined
     }
   */
   const initTime = Date.now();
@@ -243,30 +227,26 @@ router.post('/trade', async (req, res) => {
     });
     return;
   }
-  let liquidityPoolAddress, perpetualIndex;
+  let perpetual;
   try {
-    if (!symbol) {
-      throw Error('missing "symbol"');
-    }
-    const uid = await mcdex.queryPerpetualBySymbol(symbol);
-    liquidityPoolAddress = uid.liquidityPoolAddress;
-    perpetualIndex = uid.perpetualIndex;
+    perpetual = await getPerpetualInfoBySymbol(symbol);
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Symbol not found";
+    const reason = "Symbol not found or read LiquidityPool failed";
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
       message,
     });
   }
+  let gasLimit = mcdex.estimateTradeGasLimit(perpetual.perpetualCountInLiquidityPool);
   try {
     if (!amount || amount === '0') {
      throw Error('invalid "amount"');
     }
     const tx = await mcdex.trade(
-      wallet, liquidityPoolAddress, perpetualIndex, amount,
-      limitPrice, isCloseOnly, gasPrice);
+      wallet, perpetual.liquidityPoolAddress, perpetual.perpetualIndex, amount,
+      limitPrice, isCloseOnly, gasPrice, gasLimit);
     logger.info('mcdex.route - trade', { symbol });
     res.status(200).json({
       network: mcdex.network,
