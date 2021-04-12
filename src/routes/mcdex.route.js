@@ -4,11 +4,13 @@ import express from 'express';
 import { getParamData, latency, statusMessages } from '../services/utils';
 import { logger } from '../services/logger';
 import MCDEX from '../services/mcdex';
+import Fees from '../services/fees';
 
 require('dotenv').config()
 
 const router = express.Router()
 const mcdex = new MCDEX(process.env.ETHEREUM_CHAIN)
+const fees = new Fees()
 
 router.post('/', async (req, res) => {
   /*
@@ -211,7 +213,8 @@ router.post('/trade', async (req, res) => {
       symbol: {{symbol}}, // ex: 00001
       amount: {{amount}}, // < 0 means sell
       limitPrice: {{limitPrice}},
-      isCloseOnly: false // true | false
+      isCloseOnly: false // true | false,
+      gasPrice: 100
     }
   */
   const initTime = Date.now();
@@ -221,6 +224,12 @@ router.post('/trade', async (req, res) => {
   const amount = paramData.amount;
   const limitPrice = paramData.limitPrice;
   const isCloseOnly = paramData.isCloseOnly === 'true';
+  let gasPrice
+  if (paramData.gasPrice) {
+    gasPrice = parseFloat(paramData.gasPrice)
+  } else {
+    gasPrice = fees.ethGasPrice
+  }
   let wallet;
   try {
     wallet = new ethers.Wallet(privateKey, mcdex.provider);
@@ -255,7 +264,9 @@ router.post('/trade', async (req, res) => {
     if (!amount || amount === '0') {
      throw Error('invalid "amount"');
     }
-    const tx = await mcdex.trade(wallet, liquidityPoolAddress, perpetualIndex, amount, limitPrice, isCloseOnly);
+    const tx = await mcdex.trade(
+      wallet, liquidityPoolAddress, perpetualIndex, amount,
+      limitPrice, isCloseOnly, gasPrice);
     logger.info('mcdex.route - trade', { symbol });
     res.status(200).json({
       network: mcdex.network,

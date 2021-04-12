@@ -194,7 +194,7 @@ export default class mcdex {
     }
   }
 
-  async trade(wallet, liquidityPoolAddress, perpetualIndex, amount, limitPrice, isCloseOnly) {
+  async trade(wallet, liquidityPoolAddress, perpetualIndex, amount, limitPrice, isCloseOnly, gasPrice) {
     const traderAddress = wallet.address;
     const bigAmount = new BigNumber(amount.toString()).shiftedBy(DECIMALS).dp(0);
     const bigLimitPrice = new BigNumber(limitPrice.toString()).shiftedBy(DECIMALS).dp(0);
@@ -207,7 +207,7 @@ export default class mcdex {
     const liquidityPool = LiquidityPoolFactory.connect(liquidityPoolAddress, signer);
     const tx = await liquidityPool.trade(
       perpetualIndex, traderAddress, bigAmount.toFixed(), bigLimitPrice.toFixed(),
-      deadline, REFERER_ADDRESS, flags);
+      deadline, REFERER_ADDRESS, flags, { gasPrice: gasPrice * 1e9 });
     return tx;
   }
 }

@@ -136,7 +136,7 @@
 						},
 						{
 							"key": "amount",
-							"value": "1",
+							"value": "-1",
 							"type": "text"
 						},
 						{
@@ -146,8 +146,14 @@
 						},
 						{
 							"key": "limitPrice",
-							"value": "1000000",
+							"value": "0",
 							"type": "text"
+						},
+						{
+							"key": "gasPrice",
+							"value": "2.3",
+							"type": "text",
+							"disabled": true
 						}
 					]
 				},
