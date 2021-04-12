@@ -4,10 +4,10 @@ import BigNumber from 'bignumber.js';
 import fetch from 'isomorphic-fetch';
 import { getNonceManager } from './utils';
 
-import { ReaderFactory, SymbolServiceFactory, LiquidityPoolFactory, InsufficientLiquidityError } from '@mcdex/mai3-abi';
-import { DECIMALS, CHAIN_ID_TO_READER_ADDRESS, CHAIN_ID_SYMBOL_SERVICE_ADDRESS } from '@mcdex/mai3-abi';
-import { PerpetualState, TradeFlag } from '@mcdex/mai3-abi';
-import { getLiquidityPool, getAccountStorage, computeAccount } from '@mcdex/mai3-abi';
+import { ReaderFactory, SymbolServiceFactory, LiquidityPoolFactory, InsufficientLiquidityError } from '@mcdex/mai3.js';
+import { DECIMALS, CHAIN_ID_TO_READER_ADDRESS, CHAIN_ID_SYMBOL_SERVICE_ADDRESS } from '@mcdex/mai3.js';
+import { PerpetualState, TradeFlag } from '@mcdex/mai3.js';
+import { getLiquidityPool, getAccountStorage, computeAccount } from '@mcdex/mai3.js';
 
 const TRADE_EXPIRE_TIME = 86400;
 const REFERER_ADDRESS = '0x0000000000000000000000000000000000000000';
