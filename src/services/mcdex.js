@@ -15,8 +15,8 @@ export default class mcdex {
   constructor (network = 'mainnet') {
     this.providerUrl = process.env.ETHEREUM_RPC_URL;
     this.network = process.env.ETHEREUM_CHAIN;
-    this.tradeGasBase = process.env.MCDEX_TRADE_GAS_BASE || 555000;
-    this.tradeGasPerPerpetual = process.env.MCDEX_TRADE_GAS_PER_PERPETUAL || 80000;
+    this.tradeGasBase = process.env.MCDEX_TRADE_GAS_BASE || 736000;
+    this.tradeGasPerPerpetual = process.env.MCDEX_TRADE_GAS_PER_PERPETUAL || 88000;
     this.provider = new ethers.providers.JsonRpcProvider(this.providerUrl);
     this.subgraphUrl = process.env.MCDEX_SUBGRAPH_URL;
     if (!this.subgraphUrl) {
@@ -214,7 +214,7 @@ export default class mcdex {
     const bigAmount = new BigNumber(amount.toString()).shiftedBy(DECIMALS).dp(0);
     const bigLimitPrice = new BigNumber(limitPrice.toString()).shiftedBy(DECIMALS).dp(0);
     const deadline = Math.ceil(new Date() / 1000) + TRADE_EXPIRE_TIME;
-    let flags = 0;
+    let flags = TradeFlag.MASK_USE_TARGET_LEVERAGE;
     if (isCloseOnly) {
       flags = flags + TradeFlag.MASK_CLOSE_ONLY; // do NOT use "|=" to prevent js error
     }
