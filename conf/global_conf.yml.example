@@ -26,6 +26,7 @@ TERRA_CHAIN:
 # - token list: erc20 token list source (ref: https://tokenlists.org/)
 ETHEREUM_CHAIN:
 ETHEREUM_RPC_URL: "https://{chain}.infura.io/v3/{api_key}"
+#ETHEREUM_RPC_URL: "https://rinkeby.arbitrum.io/rpc"
 ETHEREUM_TOKEN_LIST_URL: https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link
 
 # Balancer

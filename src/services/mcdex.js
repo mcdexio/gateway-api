@@ -33,14 +33,11 @@ export default class mcdex {
       case 'kovan':
         this.chainID = 42;
         break;
-      case 's10':
-        this.chainID = 1337;
+      case 'arb':
+        this.chainID = 42161;
         break;
-      case 'bsc':
-        this.chainID = 56;
-        break;
-      case 'bscTestnet':
-        this.chainID = 97;
+      case 'arbtest':
+        this.chainID = 421611;
         break;
       default:
         const err = `Invalid network ${network}`;
