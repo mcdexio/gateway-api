@@ -10,9 +10,9 @@ import Fees from '../services/fees';
 const globalConfig =
   require('../services/configuration_manager').configManagerInstance;
 
-const router = express.Router()
-const mcdex = new MCDEX(globalConfig.getConfig('ETHEREUM_CHAIN'))
-const fees = new Fees()
+const router = express.Router();
+const mcdex = new MCDEX(globalConfig.getConfig('ETHEREUM_CHAIN'));
+const fees = new Fees();
 
 router.post('/', async (req, res) => {
   /*
@@ -25,9 +25,9 @@ router.post('/', async (req, res) => {
     mcdex_symbol_service: mcdex.symbolService,
     mcdex_subgraph: mcdex.subgraphUrl,
     connection: true,
-    timestamp: Date.now(),
+    timestamp: Date.now()
   });
-})
+});
 
 router.get('/symbols', async (req, res) => {
   /*
@@ -41,18 +41,18 @@ router.get('/symbols', async (req, res) => {
       network: mcdex.network,
       timestamp: initTime,
       latency: latency(initTime, Date.now()),
-      symbols,
+      symbols
     });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
     let reason;
-    err.reason ? reason = err.reason : reason = "Read symbols failed";
+    err.reason ? (reason = err.reason) : (reason = 'Read symbols failed');
     res.status(500).json({
       error: reason,
       message: err
     });
   }
-})
+});
 
 const getPerpetualInfoBySymbol = async function (symbol) {
   if (!symbol) {
@@ -61,9 +61,12 @@ const getPerpetualInfoBySymbol = async function (symbol) {
   const uid = await mcdex.queryPerpetualBySymbol(symbol);
   const liquidityPoolAddress = uid.liquidityPoolAddress;
   const perpetualIndex = uid.perpetualIndex;
-  const perpetual = await mcdex.getPerpetual(liquidityPoolAddress, perpetualIndex);
+  const perpetual = await mcdex.getPerpetual(
+    liquidityPoolAddress,
+    perpetualIndex
+  );
   return perpetual;
-}
+};
 
 router.get('/perpetual', async (req, res) => {
   /*
@@ -78,18 +81,18 @@ router.get('/perpetual', async (req, res) => {
       network: mcdex.network,
       timestamp: initTime,
       latency: latency(initTime, Date.now()),
-      perpetual,
+      perpetual
     });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = "Symbol not found or read LiquidityPool failed";
+    const reason = 'Symbol not found or read LiquidityPool failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
-})
+});
 
 router.post('/account', async (req, res) => {
   /*
@@ -108,11 +111,11 @@ router.post('/account', async (req, res) => {
     wallet = new ethers.Wallet(privateKey, mcdex.provider);
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Error getting wallet";
+    const reason = err.reason ? err.reason : 'Error getting wallet';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
     return;
   }
@@ -121,32 +124,36 @@ router.post('/account', async (req, res) => {
     perpetual = await getPerpetualInfoBySymbol(symbol);
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = "Symbol not found or read LiquidityPool failed";
+    const reason = 'Symbol not found or read LiquidityPool failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
   try {
-    const account = await mcdex.getAccount(wallet, perpetual.liquidityPoolAddress, perpetual.perpetualIndex);
+    const account = await mcdex.getAccount(
+      wallet,
+      perpetual.liquidityPoolAddress,
+      perpetual.perpetualIndex
+    );
     logger.info('mcdex.route - account', { symbol });
     res.status(200).json({
       network: mcdex.network,
       timestamp: initTime,
       latency: latency(initTime, Date.now()),
-      account,
+      account
     });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Read AccountStorage failed";
+    const reason = err.reason ? err.reason : 'Read AccountStorage failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
-})
+});
 
 router.get('/price', async (req, res) => {
   /*
@@ -155,49 +162,51 @@ router.get('/price', async (req, res) => {
                &trader={{trader}} // an address
                &isCloseOnly=false // true | false
   */
- const initTime = Date.now();
- const symbol = req.query.symbol;
- const amount = req.query.amount;
- const trader = req.query.trader;
- const isCloseOnly = req.query.isCloseOnly === 'true';
- let perpetual;
- try {
-   perpetual = await getPerpetualInfoBySymbol(symbol);
- } catch (err) {
-   logger.error(req.originalUrl, { message: err });
-   const reason = "Symbol not found or read LiquidityPool failed";
-   const message = err.message ? err.message : err;
-   res.status(500).json({
-     error: reason,
-     message,
-   });
- }
- try {
-   if (!amount || amount === '0') {
-     throw Error('invalid "amount"');
-   }
-   const price = await mcdex.getPrice(
-     perpetual.liquidityPoolAddress,
-     perpetual.perpetualIndex,
-     amount, trader, isCloseOnly
-   );
-   logger.info('mcdex.route - price', { symbol, amount });
-   res.status(200).json({
-     network: mcdex.network,
-     timestamp: initTime,
-     latency: latency(initTime, Date.now()),
-     price,
-   });
- } catch (err) {
-   logger.error(req.originalUrl, { message: err });
-   const reason = err.reason ? err.reason : "Query price failed";
+  const initTime = Date.now();
+  const symbol = req.query.symbol;
+  const amount = req.query.amount;
+  const trader = req.query.trader;
+  const isCloseOnly = req.query.isCloseOnly === 'true';
+  let perpetual;
+  try {
+    perpetual = await getPerpetualInfoBySymbol(symbol);
+  } catch (err) {
+    logger.error(req.originalUrl, { message: err });
+    const reason = 'Symbol not found or read LiquidityPool failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
- }
-})
+  }
+  try {
+    if (!amount || amount === '0') {
+      throw Error('invalid "amount"');
+    }
+    const price = await mcdex.getPrice(
+      perpetual.liquidityPoolAddress,
+      perpetual.perpetualIndex,
+      amount,
+      trader,
+      isCloseOnly
+    );
+    logger.info('mcdex.route - price', { symbol, amount });
+    res.status(200).json({
+      network: mcdex.network,
+      timestamp: initTime,
+      latency: latency(initTime, Date.now()),
+      price
+    });
+  } catch (err) {
+    logger.error(req.originalUrl, { message: err });
+    const reason = err.reason ? err.reason : 'Query price failed';
+    const message = err.message ? err.message : err;
+    res.status(500).json({
+      error: reason,
+      message
+    });
+  }
+});
 
 router.post('/trade', async (req, res) => {
   /*
@@ -218,11 +227,11 @@ router.post('/trade', async (req, res) => {
   const amount = paramData.amount;
   const limitPrice = paramData.limitPrice;
   const isCloseOnly = paramData.isCloseOnly === 'true';
-  let gasPrice
+  let gasPrice;
   if (paramData.gasPrice) {
-    gasPrice = parseFloat(paramData.gasPrice)
+    gasPrice = parseFloat(paramData.gasPrice);
   } else {
-    gasPrice = fees.ethGasPrice
+    gasPrice = fees.ethGasPrice;
   }
   let wallet;
   try {
@@ -231,11 +240,11 @@ router.post('/trade', async (req, res) => {
     );
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Error getting wallet";
+    const reason = err.reason ? err.reason : 'Error getting wallet';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
     return;
   }
@@ -244,73 +253,84 @@ router.post('/trade', async (req, res) => {
     perpetual = await getPerpetualInfoBySymbol(symbol);
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = "Symbol not found or read LiquidityPool failed";
+    const reason = 'Symbol not found or read LiquidityPool failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
-  let gasLimit = mcdex.estimateTradeGasLimit(perpetual.perpetualCountInLiquidityPool);
+  let gasLimit = mcdex.estimateTradeGasLimit(
+    perpetual.perpetualCountInLiquidityPool
+  );
   try {
     if (!amount || amount === '0') {
-     throw Error('invalid "amount"');
+      throw Error('invalid "amount"');
     }
     const tx = await mcdex.trade(
-      wallet, perpetual.liquidityPoolAddress, perpetual.perpetualIndex, amount,
-      limitPrice, isCloseOnly, gasPrice, gasLimit);
+      wallet,
+      perpetual.liquidityPoolAddress,
+      perpetual.perpetualIndex,
+      amount,
+      limitPrice,
+      isCloseOnly,
+      gasPrice,
+      gasLimit
+    );
     logger.info('mcdex.route - trade', { symbol });
     res.status(200).json({
       network: mcdex.network,
       timestamp: initTime,
       latency: latency(initTime, Date.now()),
-      txHash: tx.hash,
+      txHash: tx.hash
     });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Trade failed";
+    const reason = err.reason ? err.reason : 'Trade failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
-})
+});
 
 router.get('/receipt', async (req, res) => {
   /*
     GET: /receipt?txHash={{txHash}}
   */
-  const initTime = Date.now()
-  const txHash = req.query.txHash
+  const initTime = Date.now();
+  const txHash = req.query.txHash;
   try {
-    const txReceipt = await mcdex.provider.getTransactionReceipt(txHash)
-    const receipt = {}
-    const confirmed = txReceipt && txReceipt.blockNumber ? true : false
+    const txReceipt = await mcdex.provider.getTransactionReceipt(txHash);
+    const receipt = {};
+    const confirmed = txReceipt && txReceipt.blockNumber ? true : false;
     if (txReceipt !== null) {
-      receipt.gasUsed = ethers.utils.formatEther(txReceipt.gasUsed)
-      receipt.blockNumber = txReceipt.blockNumber
-      receipt.confirmations = txReceipt.confirmations
-      receipt.status = txReceipt.status
+      receipt.gasUsed = ethers.utils.formatEther(txReceipt.gasUsed);
+      receipt.blockNumber = txReceipt.blockNumber;
+      receipt.confirmations = txReceipt.confirmations;
+      receipt.status = txReceipt.status;
     }
-    logger.info(`mcdex.route - receipt: ${txHash}`, { message: JSON.stringify(receipt) })
+    logger.info(`mcdex.route - receipt: ${txHash}`, {
+      message: JSON.stringify(receipt)
+    });
     res.status(200).json({
       network: mcdex.network,
       timestamp: initTime,
       latency: latency(initTime, Date.now()),
       txHash: txHash,
       confirmed: confirmed,
-      receipt: receipt,
-    })
+      receipt: receipt
+    });
   } catch (err) {
     logger.error(req.originalUrl, { message: err });
-    const reason = err.reason ? err.reason : "Get receipt failed";
+    const reason = err.reason ? err.reason : 'Get receipt failed';
     const message = err.message ? err.message : err;
     res.status(500).json({
       error: reason,
-      message,
+      message
     });
   }
-})
+});
 
 export default router;
